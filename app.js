@@ -8,7 +8,7 @@ const mongoose = require('mongoose');
 const port = process.env.PORT || 3001;
 
 // API security
-app.use(helmet());
+//app.use(helmet());
 
 // Handle CORS error
 app.use(cors());
