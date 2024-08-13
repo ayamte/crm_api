@@ -1,31 +1,59 @@
 const { UserSchema } = require("./User.schema");
 
-// Insérer un nouvel utilisateur dans la base de données
-const insertUser = async (userObj) => {
-  try {
-    const data = await UserSchema(userObj).save();
-    console.log(data);
-    return data; // Retourne les données enregistrées
-  } catch (error) {
-    console.error(error);
-    throw error; // Relance l'erreur pour être capturée par l'appelant
-  }
+
+const insertUser =  (userObj) => {
+  return new Promise((resolve, reject) =>{
+    UserSchema(userObj)
+      .save()
+      .then((data) => resolve(data))
+      .catch((error) => reject(error));
+  });
 };
 
-// Obtenir un utilisateur par email
+
+
 const getUserByEmail = async (email) => {
-  if (!email) throw new Error("Email is required");
+  if (!email) return false;
 
   try {
     const user = await UserSchema.findOne({ email });
-    return user; // Retourne l'utilisateur trouvé ou null si non trouvé
+    return user;
   } catch (error) {
-    console.error(error);
-    throw error; // Relance l'erreur pour être capturée par l'appelant
+    console.log(error);
+    throw error;
   }
 };
+
+const storeUserRefreshJWT = (_id, token)=>{
+  return new Promise ((resolve, reject)=>{
+    try {
+      UserSchema.findOneAndUpdate(
+        {_id}, 
+        {
+          $set: {"refreshJWT.token":token, 
+            "refreshJWT.addedAt": Date.now()},
+          },
+          {new:true}
+        )
+        .then((data) => resolve(data))
+        .catch((error) => {
+
+          console.log(error);
+          reject(error);
+          
+        });
+    } catch (error) {
+
+      console.log(error);
+      reject(error);
+    }
+  })
+}
+ 
+
 
 module.exports = {
   insertUser,
   getUserByEmail,
-};
+  storeUserRefreshJWT,
+}

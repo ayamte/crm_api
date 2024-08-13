@@ -5,6 +5,7 @@ const {insertUser, getUserByEmail} = require("../model/user/User.model");
 const {hashPassword, comparePassword } = require('../helpers/bcrypt.helper')
 const { createAccessJWT, createRefreshJWT } = require("../helpers/jwt.helper");
 
+const {json} = require("body-parser");
 
 router.all('/', (req, res, next)=>{
   // res.json({message: "return from user router"});
@@ -45,41 +46,48 @@ router.post('/', async(req, res)=>{
 })
 
 // User sign in Router
-router.post("/login", async(req, res)=>{
+router.post("/login", async(req, res) => {
 
   console.log(req.body);
 
-  const {email, password} = req.body;
+  const { email, password } = req.body;
 
-  if (!email || !password ){
-    return res.json({status:"error", message: "Invalid from submition"});
+  if (!email || !password) {
+    return res.json({status: "error", message: "Invalid form submission"});
   }
 
-  const user = await getUserByEmail(email);
-  console.log(user);
-  const passFromDb = user && user._id ? user.password : null;
-
-  if (!passFromDb)
-		return res.json({ status: "error", message: "Invalid email or password!" });
-
-
-  const result = await comparePassword(password, passFromDb);
-
-  if(! result){
+  try {
+    const user = await getUserByEmail(email);
+    console.log("User from DB:", user);
     
-   return  res.json({status:"error", message: "Invalid email or password"});
+    const passFromDb = user && user._id ? user.password : null;
+
+    if (!passFromDb) {
+      return res.json({ status: "error", message: "Invalid email or password!" });
+    }
+
+    const result = await comparePassword(password, passFromDb);
+    console.log("Password match:", result);
+
+    if (!result) {
+      return res.json({status: "error", message: "Invalid email or password!"});
+    }
+
+    const accessJWT = await createAccessJWT(user.email, `${user._id}`);
+    const refreshJWT = await createRefreshJWT(user.email, `${user._id}`);
+
+    return res.json({
+      status: "success", 
+      message: "Login Successfully!", 
+      accessJWT,
+      refreshJWT,
+    });
+
+  } catch (error) {
+    console.log("Login Error:", error);
+    res.json({status: "error", message: "Internal server error"});
   }
+});
 
-  const accessJWT = await createAccessJWT(user.email);
-
-	const refreshJWT = await createRefreshJWT(user.email);
-
-  res.json({
-    status:"success", 
-    message: "Login Successfully!", 
-    accessJWT,
-    refreshJWT,
-  });
-})
 
 module.exports = router;
