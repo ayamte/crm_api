@@ -24,9 +24,23 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const getUserById = async (_id) => {
+  if (!_id) return false;
+
+  try {
+    const user = await UserSchema.findOne({ _id });
+    return user;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
 const storeUserRefreshJWT = (_id, token)=>{
   return new Promise ((resolve, reject)=>{
     try {
+      console.log('Updating user with ID:', _id);
+      console.log('New refresh token:', token);
       UserSchema.findOneAndUpdate(
         {_id}, 
         {
@@ -55,5 +69,6 @@ const storeUserRefreshJWT = (_id, token)=>{
 module.exports = {
   insertUser,
   getUserByEmail,
+  getUserById,
   storeUserRefreshJWT,
 }

@@ -8,6 +8,8 @@ const createAccessJWT = async (email, _id) => {
       expiresIn: "15m", 
     });
 
+    console.log("Generated Access JWT:", accessJWT);
+
     await setJWT(accessJWT, _id);
 
     return Promise.resolve(accessJWT);
@@ -20,8 +22,10 @@ const createRefreshJWT = async (email, _id) => {
 
     try {
 
-      const refreshJWT = jwt.sign({payload}, process.env.JWT_ACCESS_SECRET, {
+      const refreshJWT = jwt.sign({email}, process.env.JWT_REFRESH_SECRET, {
         expiresIn: "30d" });
+
+        console.log("Generated Refresh JWT:", refreshJWT);
   
   
       await storeUserRefreshJWT(_id, refreshJWT);
@@ -29,14 +33,28 @@ const createRefreshJWT = async (email, _id) => {
       return Promise.resolve(refreshJWT);
       
     } catch (error) {
-      return Promise.reject(refreshJWT);
+      return Promise.reject(error);
     }
   
   };
+
+
+const verifyAccessJWT = (userJWT) => {
+  try {
+
+    return Promise.resolve(jwt.verify(userJWT, process.env.JWT_ACCESS_SECRET));
+    
+  } catch (error) {
+
+    return Promise.resolve(error)
+
+  }
+}
 
 
 
 module.exports = {
   createAccessJWT,
   createRefreshJWT,
+  verifyAccessJWT,
 };

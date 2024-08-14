@@ -7,7 +7,7 @@ Content-Type: application/json
     "company" : "munisys",
     "adress" : "rabat",
     "phone" : "0673432653",
-    "email" : "e2@e.com",
+    "email" : "e4@e.com",
     "password" : "secret123"
 }
 
@@ -16,6 +16,12 @@ POST http://localhost:3001/v1/user/login
 Content-Type: application/json
 
 {
-    "email" : "e2@e.com",
+    "email" : "e4@e.com",
     "password" : "secret123"
 }
+
+### Get a user profile endpoint
+GET  http://localhost:3001/v1/user
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImU0QGUuY29tIiwiaWF0IjoxNzIzNjUwODQ2LCJleHAiOjE3MjM2NTE3NDZ9.kMJ0TXywjJOdYMTXByFdumWtsGUuXu9AHtWMF-9BNa
+
+
