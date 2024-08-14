@@ -5,7 +5,7 @@ const {storeUserRefreshJWT} = require("../model/user/User.model");
 const createAccessJWT = async (email, _id) => {
   try {
     const accessJWT = await jwt.sign({ email }, process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "15m", 
+      expiresIn: "1m", 
     });
 
     console.log("Generated Access JWT:", accessJWT);
@@ -51,10 +51,23 @@ const verifyAccessJWT = (userJWT) => {
   }
 }
 
+const verifyRefreshJWT = (userJWT) => {
+  try {
+
+    return Promise.resolve(jwt.verify(userJWT, process.env.JWT_REFRESH_SECRET));
+    
+  } catch (error) {
+
+    return Promise.resolve(error)
+
+  }
+}
+
 
 
 module.exports = {
   createAccessJWT,
   createRefreshJWT,
   verifyAccessJWT,
+  verifyRefreshJWT,
 };
