@@ -63,6 +63,21 @@ const storeUserRefreshJWT = (_id, token)=>{
     }
   })
 }
+
+const updatePassword = async (email, newHashedPass) => {
+  try {
+    const updatedUser = await UserSchema.findOneAndUpdate(
+      { email },
+      { $set: { password: newHashedPass } },
+      { new: true } 
+    ).exec();
+
+    return updatedUser;
+  } catch (error) {
+    console.log(error);
+    throw error; 
+  }
+};
  
 
 
@@ -71,4 +86,5 @@ module.exports = {
   getUserByEmail,
   getUserById,
   storeUserRefreshJWT,
+  updatePassword,
 }

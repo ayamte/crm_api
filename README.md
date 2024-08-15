@@ -19,7 +19,7 @@ All the user API router follows `/v1/user/`
 | 1   | `/v1/user`                | GET    | Done     | Yes        | Get user Info                                    |
 | 2   | `/v1/user`                | POST   | Done     | No         | Create a user                                    |
 | 3   | `/v1/user/login`          | POST   | Done     | No         | Verify user Authentication and return JWT        |
-| 4   | `/v1/user/reset-password` | POST   |          | No         | Verify email and email pin to reset the password |
+| 4   | `/v1/user/reset-password` | POST   | Done     | No         | Verify email and email pin to reset the password |
 | 5   | `/v1/user/reset-password` | PATCH  |          | No         | Replace with new password                        |
 | 6   | `/v1/user/logout`         | DELETE |          | Yes        | Delete user accessJWT                            |
 

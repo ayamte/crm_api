@@ -23,14 +23,33 @@ const send = (info) => {
   });
 };
 
-const emailProcessor = async (email, pin) => {
-  const info = {
-    from: '"Munisys Company" <julian.bernier89@ethereal.email>', // sender address
-    to: email, // list of receivers
-    subject: "Password reset Pin", // Subject line
-    text: "Here is your password reset pin: " + pin + " This pin will expire in 1 day", // plain text body
-    html: `<b>Hello,</b><br/>Here is your pin: <b>${pin}</b><br/>This pin will expire in 1 day`, // html body
-  };
+const emailProcessor = async ({ email, pin, type }) => {
+  let info = '';
+
+  switch (type) {
+    case "request-new-password":
+      info = {
+        from: '"Munisys Company" <julian.bernier89@ethereal.email>', // sender address
+        to: email, // list of receivers
+        subject: "Password reset Pin", // Subject line
+        text: "Here is your password reset pin: " + pin + " This pin will expire in 1 day", // plain text body
+        html: `<b>Hello,</b><br/>Here is your pin: <b>${pin}</b><br/>This pin will expire in 1 day`, // html body
+      };
+      break;
+
+    case "password-update-success":
+      info = {
+        from: '"Munisys Company" <julian.bernier89@ethereal.email>', // sender address
+        to: email, // list of receivers
+        subject: "Password updated", // Subject line
+        text: "Your new password has been updated", // plain text body
+        html: `<b>Hello,</b><br/><p>Your new password has been updated</p>`, // html body
+      };
+      break;
+
+    default:
+      break;
+  }
 
   try {
     await send(info); // Attendre que l'e-mail soit envoyé
@@ -38,6 +57,7 @@ const emailProcessor = async (email, pin) => {
     console.log("Failed to send email:", error); // Log en cas d'erreur
   }
 };
+
 
   
   

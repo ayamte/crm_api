@@ -20,38 +20,30 @@ const setPasswordRestPin = async (email) => {
   });
 };
 
-// const getPinByEmailPin = (email, pin) => {
-//   return new Promise((resolve, reject) => {
-//     try {
-//       ResetPinSchema.findOne({ email, pin }, (error, data) => {
-//         if (error) {
-//           console.log(error);
-//           resolve(false);
-//         }
+const getPinByEmailPin = async (email, pin) => {
+  try {
+    const data = await ResetPinSchema.findOne({ email, pin }).exec();
+    return data || false;
+  } catch (error) {
+    console.log(error);
+    throw error; // Laisse l'erreur être gérée plus haut si nécessaire
+  }
+};
 
-//         resolve(data);
-//       });
-//     } catch (error) {
-//       reject(error);
-//       console.log(error);
-//     }
-//   });
-// };
 
-// const deletePin = (email, pin) => {
-//   try {
-//     ResetPinSchema.findOneAndDelete({ email, pin }, (error, data) => {
-//       if (error) {
-//         console.log(error);
-//       }
-//     });
-//   } catch (error) {
-//     console.log(error);
-//   }
-// };
+const deletePin = async (email, pin) => {
+  try {
+    const deletedPin = await ResetPinSchema.findOneAndDelete({ email, pin }).exec(); 
+    return deletedPin;
+  } catch (error) {
+    console.log(error);
+    throw error; 
+  }
+};
+
 
 module.exports = {
   setPasswordRestPin,
-  // getPinByEmailPin,
-  // deletePin,
+  getPinByEmailPin,
+  deletePin,
 };

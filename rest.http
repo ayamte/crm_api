@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
     "email" : "e4@e.com",
-    "password" : "secret123"
+    "password" : "password1"
 }
 
 ### Get a user profile endpoint
@@ -46,7 +46,7 @@ Content-Type: application/json
 
 {
     "email": "e4@e.com",
-    "pin": "674783",
-    "newPassword": "password"
+    "pin": "883182",
+    "newPassword": "password2"
 }
 

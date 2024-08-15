@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const {insertUser, getUserByEmail, getUserById} = require("../model/user/User.model");
+const {insertUser, getUserByEmail, getUserById, updatePassword} = require("../model/user/User.model");
 const {hashPassword, comparePassword } = require('../helpers/bcrypt.helper')
 const { createAccessJWT, createRefreshJWT } = require("../helpers/jwt.helper");
 
 const {userAuthorization} = require("../middlewares/authorization.middleware");
 
-const {setPasswordRestPin} = require("../model/restPin/RestPin.model");
+const {setPasswordRestPin, getPinByEmailPin, deletePin} = require("../model/restPin/RestPin.model");
 const { emailProcessor } = require("../helpers/email.helper");
+const {resetPassReqValidation, updatePassValidation} =require("../middlewares/formValidation.middleware");
 
 router.all('/', (req, res, next)=>{
   // res.json({message: "return from user router"});
@@ -109,27 +110,69 @@ router.post("/login", async(req, res) => {
 
 
 
-router.post('/reset-password', async (req,res) =>{
+router.post('/reset-password', resetPassReqValidation, async (req,res) =>{
   const {email} = req.body;
 
   const user = await getUserByEmail(email);
 
   if(user && user._id){
     const setPin = await setPasswordRestPin(email);
-    const result = await emailProcessor(email, setPin.pin);
+    await emailProcessor({email, pin: setPin.pin, type: 'request-new-password'});
 
-    if(result && result.messageId){
+   
       return res.json({
         status: "success",
         message: "If the email exist in our database, the password reset pin will be sent shortly. "
-      });
-    }
-    res.json({
-      status: "success", 
-      message:"Unable to process your request at the moment. Plz try again later!"
-    });}
+      });}
+    
 
-  res.json({status: "error", message:"If the email exist in our database, the password reset pin will be sent shortly."});
+  return res.json({
+    status: "error", 
+    message:"If the email exist in our database, the password reset pin will be sent shortly."});
+});
+
+
+router.patch('/reset-password', updatePassValidation, async (req,res) =>{
+  const {email, pin, newPassword} = req.body;
+  const getPin = await getPinByEmailPin(email, pin);
+
+  if(getPin._id){
+
+    const dbDate = getPin.addedAt;
+    const expiresIn = 1;
+    let expDate = dbDate.setDate(dbDate.getDate() + expiresIn);
+    const today = new Date()
+
+    if(today > expDate){
+      return res.json({
+        status: "error",
+        message:"Invalid pin or expired pin."
+      })
+    }
+
+    const hashPass = await hashPassword(newPassword);
+
+    const user = await updatePassword(email, hashPass);
+
+    if(user._id){
+      /// send email notification
+      await emailProcessor({email, type: 'password-update-success'});
+
+      /// delete pin from database
+      deletePin(email, pin);
+
+      return res.json({
+        status: "success", 
+        message:"Your password has been updated."
+    })
+    }
+
+  }
+  res.json({
+    status: "error", 
+    message:"Unable to update your password. Please try again later."
+  });
+
 });
 
 
