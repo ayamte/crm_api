@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const {insertUser, getUserByEmail, getUserById, updatePassword} = require("../model/user/User.model");
+const {insertUser, getUserByEmail, getUserById, updatePassword, storeUserRefreshJWT} = require("../model/user/User.model");
 const {hashPassword, comparePassword } = require('../helpers/bcrypt.helper')
 const { createAccessJWT, createRefreshJWT } = require("../helpers/jwt.helper");
 
@@ -10,6 +10,8 @@ const {userAuthorization} = require("../middlewares/authorization.middleware");
 const {setPasswordRestPin, getPinByEmailPin, deletePin} = require("../model/restPin/RestPin.model");
 const { emailProcessor } = require("../helpers/email.helper");
 const {resetPassReqValidation, updatePassValidation} =require("../middlewares/formValidation.middleware");
+const {verify} = require ("jsonwebtoken");
+const {deleteJWT} = require("../helpers/redis.helper");
 
 router.all('/', (req, res, next)=>{
   // res.json({message: "return from user router"});
@@ -109,7 +111,7 @@ router.post("/login", async(req, res) => {
 });
 
 
-
+/// Verify email and email pin to reset the password
 router.post('/reset-password', resetPassReqValidation, async (req,res) =>{
   const {email} = req.body;
 
@@ -131,7 +133,7 @@ router.post('/reset-password', resetPassReqValidation, async (req,res) =>{
     message:"If the email exist in our database, the password reset pin will be sent shortly."});
 });
 
-
+/// Replace with new password 
 router.patch('/reset-password', updatePassValidation, async (req,res) =>{
   const {email, pin, newPassword} = req.body;
   const getPin = await getPinByEmailPin(email, pin);
@@ -174,6 +176,29 @@ router.patch('/reset-password', updatePassValidation, async (req,res) =>{
   });
 
 });
+
+/// Delete user accessJWT
+router.delete("/logout", userAuthorization, async (req, res) => {
+	const { authorization } = req.headers;
+	//this data coming form database
+	const _id = req.userId;
+
+	// delete accessJWT from redis database
+	deleteJWT(authorization);
+
+	// delete refreshJWT from mongodb
+	const result = await storeUserRefreshJWT(_id, "");
+
+	if (result._id) {
+		return res.json({ status: "success", message: "Logged out successfully" });
+	}
+
+	res.json({
+		status: "error",
+		message: "Unable to log you out, plz try again later",
+	});
+});
+
 
 
 module.exports = router;

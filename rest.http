@@ -17,7 +17,7 @@ Content-Type: application/json
 
 {
     "email" : "e4@e.com",
-    "password" : "password1"
+    "password" : "password"
 }
 
 ### Get a user profile endpoint
@@ -46,7 +46,11 @@ Content-Type: application/json
 
 {
     "email": "e4@e.com",
-    "pin": "883182",
-    "newPassword": "password2"
+    "pin": "492461",
+    "newPassword": "password"
 }
+
+#### user logout endpoint
+DELETE http://localhost:3001/v1/user/logout
+Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImU0QGUuY29tIiwiaWF0IjoxNzIzNjkzMjA2LCJleHAiOjE3MjM2OTQxMDZ9.pdMchEua85wbV0EYmFcktrsOcQBguaU5MejRlGA8prM
 
