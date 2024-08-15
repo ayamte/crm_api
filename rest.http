@@ -32,3 +32,21 @@ Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImU0QGUuY29tIiwi
 GET http://localhost:3001/v1/tokens
 Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImU0QGUuY29tIiwiaWF0IjoxNzIzNjU2MDMwLCJleHAiOjE3MjYyNDgwMzB9.YXchZ4BUA96m8t37XgmRd4q09hG5tCrQ4kliAcUsxWY
 
+#### Password reset request endpoints
+POST http://localhost:3001/v1/user/reset-password
+Content-Type: application/json 
+
+{
+    "email": "e4@e.com"
+}
+
+#### Update new password endpoint
+PATCH  http://localhost:3001/v1/user/reset-password
+Content-Type: application/json 
+
+{
+    "email": "e4@e.com",
+    "pin": "674783",
+    "newPassword": "password"
+}
+
