@@ -1,15 +1,12 @@
 const redis = require("redis");
 const client = redis.createClient({ url: process.env.REDIS_URL });
 
-client.connect().catch(console.error);
-
+client.connect()
+  .then(() => console.log("Connected to Redis server"))
+  .catch(console.error);
 
 client.on("error", (error) => {
   console.error("Redis Client Error:", error);
-});
-
-client.on("connect", () => {
-  console.log("Connected to Redis server");
 });
 
 client.on("end", () => {
@@ -38,14 +35,18 @@ const getJWT = async (key) => {
   }
 };
 
-const deleteJWT = (key) =>{
-    try {
-      client.del(key);
-    } catch (error) {
-      console.log(error);
-    }
+const deleteJWT = async (key) => {
+  try {
+      if (typeof key !== 'string') {
+          throw new TypeError("Invalid argument type: key must be a string");
+      }
+      await client.del(key);
+      console.log(`Deleted key ${key} from Redis`);
+  } catch (error) {
+      console.error("Error deleting JWT from Redis:", error);
+      throw error;
+  }
 };
-
 
 
 module.exports = {

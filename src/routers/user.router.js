@@ -27,8 +27,15 @@ router.get("/",userAuthorization, async (req,res) =>{
   const _id = req.userId;
 
   const userProf = await getUserById(_id);
+  const {name, email} = userProf;
 
-res.json({user: userProf});
+  res.json({user: {
+  _id,
+  name,
+  email,
+  }
+
+});
 })
 
 
